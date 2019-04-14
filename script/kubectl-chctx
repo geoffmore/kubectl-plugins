@@ -1,0 +1,29 @@
+#!/bin/bash
+### Changes context ###
+if [[ ! -z "$1" ]]; then
+  CONTEXT_INPUT="$1"
+else 
+  echo "Here are a list of contexts Choose one."
+  # Aggregate a list of contexts
+  select opt in \
+    $(kubectl config get-contexts --no-headers=true --output=name) \
+    "Quit"; 
+  do
+    case "$opt" in
+      "Quit")
+        echo "You dediced to quit for some reason. Exiting..."
+        user_quit=true
+        break;;
+      *)
+        CONTEXT_INPUT="$opt"
+        break;;
+    esac
+  done
+fi
+
+if [[ $user_quit ]]; then
+  exit
+else 
+  echo "Changing your current context to '$CONTEXT_INPUT'."
+  kubectl config use-context "$CONTEXT_INPUT"
+fi

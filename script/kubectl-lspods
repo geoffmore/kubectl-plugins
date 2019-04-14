@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Lists pods
+# '--all' can be passed to list in all namespaces
+kubectl get pods \
+  -o=jsonpath='{range .items[*]}{.metadata.namespace}:{.metadata.name}:{.status.phase}{"\n"}{end}' \
+  --all-namespaces 2> /dev/null
