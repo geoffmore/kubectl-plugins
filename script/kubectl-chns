@@ -1,0 +1,35 @@
+#!/bin/bash
+
+### Changes namespace in the current context ###
+# See if there is a $1
+if [[ ! -z "$1" ]]; then
+  NAMESPACE_INPUT="$1"
+else 
+  #https://askubuntu.com/questions/1705/how-can-i-create-a-select-menu-in-a-shell-script
+  echo "Here are a list of namespaces in the current context. Choose one."
+  # Aggregate a list of namespaces in the current context
+  #https://kubernetes.io/docs/reference/kubectl/overview/#custom-columns
+  select opt in \
+    $(kubectl get namespaces --no-headers=true -o custom-columns=NAME:.metadata.name) \
+    "Quit"; 
+  do
+    # Assign set the desired namespace if the option isn't 'Quit'
+    case "$opt" in
+      "Quit")
+        echo "You dediced to quit for some reason. Exiting..."
+        user_quit=true
+        break;;
+      *)
+        NAMESPACE_INPUT="$opt"
+        break;;
+    esac
+  done
+fi
+
+if [[ $user_quit ]]; then
+  exit
+else 
+  CURRENT_CONTEXT="$(kubectl config current-context)"
+  echo "Changing the namespace of your your current context to '$NAMESPACE_INPUT'."
+  kubectl config set-context $CURRENT_CONTEXT --namespace=$NAMESPACE_INPUT
+fi

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Starts an interactive pod in the current namespace that completes upon exit
+#kubectl run -i -t debug --image=brix4dayz/swiss-army-knife --restart=Never -- \
+#  /bin/sh
+kubectl run debug \
+  --image=brix4dayz/swiss-army-knife \
+  --rm=true \
+  --restart=Never \
+  --stdin=true
+  --tty=true \
+  -- /bin/sh 
